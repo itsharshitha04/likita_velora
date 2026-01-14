@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Product Detail</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/6c72dc7f0f89/launch-3a899434ad9d-development.min.js" async></script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'pdp')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'pdp')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'pdp')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'pdp')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+
+<div class="container" id="pdpContainer"></div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'pdp')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'pdp')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'pdp')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'pdp')" style="color:#fff;text-decoration:none;">Checkout</a>
+      <a href="#" onclick="window.adl.trackLinkClick('about', 'footer', 'footer', 'pdp'); return false;" style="color:#fff;text-decoration:none;">About</a>
+      <a href="#" onclick="window.adl.trackLinkClick('contact', 'footer', 'footer', 'pdp'); return false;" style="color:#fff;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+  // Initialize cart to show count badge
+  initCart();
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || '1';
+  const product = products.find(p=>p.id===id);
+  const container = document.getElementById('pdpContainer');
+
+  if (!product) {
+    container.innerHTML = '<h2>Product not found</h2><p><a href="plp.html" onclick="window.adl.trackLinkClick(event, { linkName: \'Back to Shop\', linkURL: \'plp.html\', linkType: \'navigation\', linkPosition: \'pdp\' });">Back to Shop</a></p>';
+  } else {
+    // Create product detail display with proper image error handling
+    const img = document.createElement('img');
+    img.alt = product.name;
+    img.width = 300;
+    img.height = 400;
+    img.style.objectFit = 'cover';
+    img.style.borderRadius = '10px';
+    img.style.display = 'block';
+    img.style.backgroundColor = '#f0f0f0';
+    
+    let imageLoaded = false;
+    
+    // Image loaded successfully - show it
+    img.onload = function() {
+      imageLoaded = true;
+      this.style.opacity = '1';
+    };
+    
+    // Image failed to load - use fallback
+    img.onerror = function() {
+      if (!imageLoaded) {
+        this.src = 'https://via.placeholder.com/300x400/cccccc/666666?text=' + encodeURIComponent(product.name.substring(0, 20));
+        imageLoaded = true;
+        this.style.opacity = '1';
+      }
+    };
+    
+    // Set initial state for fade-in
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.3s ease-in';
+    
+    // Start loading the image
+    img.src = product.image;
+    
+    // Check if image is already cached/loaded
+    if (img.complete && img.naturalHeight !== 0) {
+      img.style.opacity = '1';
+      imageLoaded = true;
+    }
+    
+    container.innerHTML = `
+      <h2>${product.name}</h2>
+      <p>Category: ${product.category}</p>
+      <p>Brand: Aurora</p>
+      <p>Price: ₹${product.price}</p>
+    `;
+    
+    // Create Add to Cart button with tracking
+    // Per spec: DO NOT fire linkClicked for Add to Cart - use addToCart event only
+    const addToCartBtn = document.createElement('button');
+    addToCartBtn.textContent = 'Add to Cart';
+    addToCartBtn.style.cssText = 'padding:10px 20px;background:#222;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;margin-top:10px;';
+    addToCartBtn.onclick = function(e) {
+      e.preventDefault();
+      
+      // Track addToCart event ONLY (no linkClicked per spec)
+      if (window.adl && window.adl.trackAddToCart) {
+        window.adl.trackAddToCart({
+          sku: product.sku || 'SKU-' + product.id,
+          productID: 'VEL-' + product.id,
+          productName: product.name,
+          brand: 'velora',
+          category: product.category,
+          color: '',
+          size: '',
+          price: product.price,
+          quantity: 1,
+          linkPosition: 'pdp-add-to-cart',
+          linkType: 'cta'
+        });
+      }
+      
+      addToCart(product);
+    };
+    container.appendChild(addToCartBtn);
+    
+    // Insert image before the first element
+    container.insertBefore(img, container.firstChild);
+    
+    // Fire pageLoaded with productDetails (PDP is the ONLY page where productDetails is in pageLoaded)
+    if (window.adl && window.adl.firePageLoaded) {
+      window.adl.firePageLoaded({
+        pageName: 'product:VEL-' + product.id,
+        pageType: 'pdp',
+        productDetails: {
+          productID: 'VEL-' + product.id,
+          sku: product.sku || 'SKU-' + product.id,
+          productName: product.name,
+          brand: 'velora',
+          category: product.category,
+          price: product.price,
+          color: '',
+          size: '',
+          quantity: 1,
+          currency: 'USD'
+        }
+      });
+    }
+  }
+</script>
+</body>
+</html>
