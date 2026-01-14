@@ -34,7 +34,7 @@ Serve locally (recommended)
   Then open http://localhost:8000 in your browser.
 
 Quick testing checklist
-- Open console and verify sessionStorage keys: `aurora_pageData` and `aurora_lastLinkClicked`.
+- Open console and verify sessionStorage keys: `velora_pageData` and `velora_lastLinkClicked`.
 - Click header links: linkClicked should be pushed and persisted, then navigation occurs (300ms).
 - Navigate between pages: restored linkClicked should appear before new pageLoaded.
 - Confirm console logs: ✓ ACDL: ... tracked: and 📊 ACDL Length:

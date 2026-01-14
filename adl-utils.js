@@ -1,6 +1,6 @@
 /**
  * Adobe Data Layer (ADL) Utilities
- * Aurora Apparel Implementation
+ * velora Apparel Implementation
  * 
  * Event Types:
  * - pageLoaded: Page-level metadata only
@@ -124,7 +124,7 @@
           custData: custData,
           web: {
             webPageDetails: {
-              brand: "aurora",
+              brand: "velora",
               channel: "web|" + pageType,
               pageName: pageName,
               pageType: pageType,
@@ -143,7 +143,7 @@
           productID: product.productID || '',
           sku: product.sku || '',
           productName: product.productName || '',
-          brand: product.brand || 'aurora',
+          brand: product.brand || 'velora',
           category: product.category || '',
           price: product.price || 0,
           color: product.color || '',
@@ -227,7 +227,7 @@
         xdmActionDetails: {
           web: {
             webInteraction: {
-              brand: "aurora",
+              brand: "velora",
               channel: "web|" + pageName,
               linkName: linkName,
               linkType: linkType,
@@ -278,7 +278,7 @@
             sku: product.sku || '',
             productID: product.productID,
             productName: product.productName,
-            brand: product.brand || 'aurora',
+            brand: product.brand || 'velora',
             category: product.category,
             color: product.color || '',
             size: product.size || '',
@@ -328,7 +328,7 @@
             sku: product.sku || '',
             productID: product.productID,
             productName: product.productName,
-            brand: product.brand || 'aurora',
+            brand: product.brand || 'velora',
             category: product.category || '',
             price: product.price || 0,
             color: product.color || '',
@@ -377,7 +377,7 @@
                 sku: p.sku || '',
                 productID: p.productID,
                 productName: p.productName,
-                brand: p.brand || 'aurora',
+                brand: p.brand || 'velora',
                 category: p.category || '',
                 price: p.price || 0,
                 color: p.color || '',
@@ -463,7 +463,7 @@
                 sku: p.sku || '',
                 productID: p.productID,
                 productName: p.productName,
-                brand: p.brand || 'aurora',
+                brand: p.brand || 'velora',
                 category: p.category || '',
                 price: p.price || 0,
                 color: p.color || '',
@@ -521,7 +521,7 @@
                 sku: p.sku || '',
                 productID: p.productID,
                 productName: p.productName,
-                brand: p.brand || 'aurora',
+                brand: p.brand || 'velora',
                 category: p.category || '',
                 price: p.price || 0,
                 color: p.color || '',
@@ -583,5 +583,5 @@
     });
   };
 
-  console.log('ADL: Aurora Apparel Data Layer utilities initialized');
+  console.log('ADL: velora Apparel Data Layer utilities initialized');
 })();

@@ -1,8 +1,8 @@
 /**
  * Adobe Data Layer XDM Helper (updated)
  * Ensures ACDL events follow the repository-wide contract:
- *  - pageLoaded events (persisted in sessionStorage as aurora_pageData)
- *  - linkClicked events (persisted in sessionStorage as aurora_lastLinkClicked)
+ *  - pageLoaded events (persisted in sessionStorage as velora_pageData)
+ *  - linkClicked events (persisted in sessionStorage as velora_lastLinkClicked)
  *  - All events include custData for consistent Adobe Launch access
  */
 
@@ -52,12 +52,12 @@ function localPushToDataLayer(obj) {
     if (obj.event === 'linkClicked') {
       // Ensure timestamp present
       if (!obj.timestamp) obj.timestamp = Date.now();
-      sessionStorage.setItem('aurora_lastLinkClicked', JSON.stringify(obj));
+      sessionStorage.setItem('velora_lastLinkClicked', JSON.stringify(obj));
     }
     if (obj.event === 'pageLoaded') {
       // Ensure timestamp present
       if (!obj.timestamp) obj.timestamp = Date.now();
-      sessionStorage.setItem('aurora_pageData', JSON.stringify(obj));
+      sessionStorage.setItem('velora_pageData', JSON.stringify(obj));
     }
   } catch (e) {
     // ignore storage failures
@@ -149,9 +149,9 @@ function pushPageView(options = {}) {
     event: 'pageLoaded',
     xdmPageLoad: {
       pageInfo: {
-        pageName: (pageName ? pageName + ' | aurora' : (window.location.pathname || 'unknown') + ' | aurora'),
+        pageName: (pageName ? pageName + ' | velora' : (window.location.pathname || 'unknown') + ' | velora'),
         pageURL: window.location.href,
-        server: 'aurora-server'
+        server: 'velora-server'
       },
       custData: custData
     },
@@ -189,23 +189,23 @@ function pushLinkClick(options = {}) {
   
   // Match the same page name logic as adl-utils.js
   if (path.includes('pdp.html') || params.get('id')) {
-    currentPageName = 'Product Detail | aurora';
+    currentPageName = 'Product Detail | velora';
   } else if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
-    currentPageName = 'home page | aurora';
+    currentPageName = 'home page | velora';
   } else if (path.includes('plp.html')) {
-    currentPageName = 'Shop | aurora';
+    currentPageName = 'Shop | velora';
   } else if (path.includes('cart.html')) {
-    currentPageName = 'Cart | aurora';
+    currentPageName = 'Cart | velora';
   } else if (path.includes('checkout.html')) {
-    currentPageName = 'Checkout | aurora';
+    currentPageName = 'Checkout | velora';
   } else if (path.includes('payment.html')) {
-    currentPageName = 'Payment | aurora';
+    currentPageName = 'Payment | velora';
   } else if (path.includes('thankyou.html')) {
-    currentPageName = 'Thank You | aurora';
+    currentPageName = 'Thank You | velora';
   } else if (document.title) {
-    currentPageName = document.title.includes('|') ? document.title : document.title + ' | aurora';
+    currentPageName = document.title.includes('|') ? document.title : document.title + ' | velora';
   } else {
-    currentPageName = (path.split('/').pop() || 'unknown') + ' | aurora';
+    currentPageName = (path.split('/').pop() || 'unknown') + ' | velora';
   }
 
   const currentPageURL = window.location.href;

@@ -24,9 +24,9 @@ What to capture:
   event: "pageLoaded",
   xdmPageLoad: {
     pageInfo: {
-      pageName: "home page | aurora",
+      pageName: "home page | velora",
       pageURL: "<https://example.com/>",
-      server: "aurora-server"
+      server: "velora-server"
     },
     custData: {
       loginStatus: "guest" | "logged-in",
@@ -57,7 +57,7 @@ What to capture:
     web: {
       webInteraction: {
         linkName: "SELECT" | "Collection" | "Add to Cart",
-        linkPageName: "home page | aurora",
+        linkPageName: "home page | velora",
         linkPosition: "hero section" | "header" | "product card",
         linkType: "navigation" | "cta" | "form",
         linkURL: "/plp.html",
@@ -71,7 +71,7 @@ Implementation:
 Use onclick="window.adl.trackLinkClick(event, {...})" on all interactive elements
 Call event.preventDefault() to stop immediate navigation
 Push event to data layer
-Store in sessionStorage with key aurora_lastLinkClicked
+Store in sessionStorage with key velora_lastLinkClicked
 Navigate programmatically after 300ms delay using setTimeout()
 Elements that MUST track:
 Header logo
@@ -86,14 +86,14 @@ Any element that changes page or triggers action
 Purpose: Maintain event continuity across page navigations
 Storage Keys:
 // Store last link clicked before navigation
-sessionStorage.setItem('aurora_lastLinkClicked', JSON.stringify({
+sessionStorage.setItem('velora_lastLinkClicked', JSON.stringify({
   event: "linkClicked",
   custData: {...},
   xdmActionDetails: {...},
   timestamp: Date.now()
 }));
 // Store current page data
-sessionStorage.setItem('aurora_pageData', JSON.stringify({
+sessionStorage.setItem('velora_pageData', JSON.stringify({
   event: "pageLoaded",
   xdmPageLoad: {...},
   timestamp: Date.now()
@@ -171,7 +171,7 @@ Testing Checklist
 [ ]  Verify data layer length increases from 1 to 2
 [ ]  After navigation, verify previous linkClicked is restored
 [ ]  Verify new page's pageLoaded comes after restored linkClicked
-[ ]  Check sessionStorage contains aurora_lastLinkClicked
+[ ]  Check sessionStorage contains velora_lastLinkClicked
 [ ]  Verify all console logs appear with ✓ symbols
 [ ]  Test on multiple pages and navigation paths
 [ ]  Verify Adobe Launch rules fire correctly
