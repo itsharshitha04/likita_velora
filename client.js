@@ -313,7 +313,8 @@ function removeFromCart(productId) {
 
 // Add to cart handler
 // CRITICAL: This function should NOT navigate - cart must work without breaking
-function handleAddToCart(productId, qty=1) {
+// NOTE: Tracking is handled by the calling code (HTML onclick handlers) to avoid duplicate events
+function handleAddToCart(productId, qty=1, skipTracking=false) {
   const prod = products.find(p=>p.id===String(productId));
   if (!prod) return;
   const cart = getCart();
@@ -326,23 +327,7 @@ function handleAddToCart(productId, qty=1) {
   setCart(cart);
   initCart();
   
-  // Track add to cart event using ACDL e-commerce event (Phase 7)
-  // Note: linkClicked tracking is handled by the button's onclick handler
-  if (window.adl && window.adl.trackAddToCart) {
-    try {
-      window.adl.trackAddToCart({
-        productID: prod.id || '',
-        productName: prod.name || '',
-        category: prod.category || '',
-        price: prod.price || 0,
-        quantity: qty
-      });
-    } catch (e) {
-      console.error('ACDL: Error tracking add to cart', e);
-    }
-  }
-  
-  // Visual feedback (optional - can be enhanced with toast notification)
+  // Visual feedback
   if (typeof window !== 'undefined' && window.console) {
     console.log('✓ Product added to cart:', prod.name);
   }
