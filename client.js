@@ -191,6 +191,7 @@ function loadCart() {
       e.preventDefault();
       
       // Track remove from cart event using ACDL e-commerce event
+      // NOTE: No linkClicked event for cart actions (per spec)
       if (window.adl && window.adl.trackRemoveFromCart) {
         window.adl.trackRemoveFromCart({
           productID: item.id || '',
@@ -198,17 +199,6 @@ function loadCart() {
           category: item.category || '',
           price: item.price || 0,
           quantity: item.quantity || 1
-        });
-      }
-      
-      // Also track as link click for compatibility
-      if (window.adl && window.adl.trackLinkClick) {
-        window.adl.trackLinkClick({
-          linkName: 'Remove from Cart',
-          linkType: 'cta',
-          linkPosition: 'cart',
-          productCategory: item.category || '',
-          shouldNavigate: false
         });
       }
       
@@ -268,6 +258,7 @@ function updateCartQuantity(productId, newQuantity) {
 }
 
 // Remove item from cart
+// NOTE: Tracking is handled by the calling code (button onclick) to avoid duplicate events
 function removeFromCart(productId) {
   const cart = getCart();
   const item = cart.find(i => String(i.id) === String(productId));
@@ -293,21 +284,7 @@ function removeFromCart(productId) {
     });
     window.adl.updateProductDetails(products);
   }
-  
-  // Track removal as e-commerce event (already tracked in removeBtn.onclick)
-  // This function is also called from other places, so we track here too
-  if (item && window.adl && window.adl.trackRemoveFromCart) {
-    try {
-      window.adl.trackRemoveFromCart({
-        productID: item.id || '',
-        productName: item.name || '',
-        category: item.category || '',
-        price: item.price || 0,
-        quantity: item.quantity || 1
-      });
-    } catch (e) {
-      console.error('ACDL: Error tracking remove from cart', e);
-    }
+}
   }
 }
 
