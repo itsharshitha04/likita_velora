@@ -285,8 +285,6 @@ function removeFromCart(productId) {
     window.adl.updateProductDetails(products);
   }
 }
-  }
-}
 
 // Add to cart handler
 // CRITICAL: This function should NOT navigate - cart must work without breaking
