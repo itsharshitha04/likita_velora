@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', function(){
         orderID: order.id,
         orderTotal: order.revenue || 0,
         currency: 'USD',
-        paymentMethod: 'card'
+        paymentMethod: 'card',
+        email: displayEmail
       },
       productDetails: purchaseProducts
     });
