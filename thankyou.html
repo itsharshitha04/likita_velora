@@ -76,10 +76,26 @@ document.addEventListener('DOMContentLoaded', function(){
 
   const orderDetailsEl = document.getElementById('orderDetails');
 
+  // Function to generate random email
+  function generateRandomEmail() {
+    const firstNames = ['john', 'emma', 'michael', 'sophia', 'david', 'olivia', 'james', 'ava', 'william', 'isabella', 'robert', 'mia', 'joseph', 'charlotte', 'daniel', 'amelia', 'henry', 'harper', 'alexander', 'evelyn'];
+    const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'wilson', 'anderson', 'taylor', 'thomas', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson'];
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'mail.com'];
+    const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const randomNum = Math.floor(Math.random() * 999) + 1;
+    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+    return randomFirst + '.' + randomLast + randomNum + '@' + randomDomain;
+  }
+
   if (order && order.id) {
-    // Display order ID
+    // Use existing email or generate a random one
+    const displayEmail = order.email || generateRandomEmail();
+    
+    // Display order ID and email
     let html = `<div style="background:#f0f0f0;padding:20px;border-radius:8px;margin-bottom:20px;">`;
     html += `<p style="font-size:18px;margin:0 0 10px 0;"><strong>Order ID:</strong> <span style="color:#ff4081;font-weight:bold;">${order.id}</span></p>`;
+    html += `<p style="font-size:16px;margin:0 0 10px 0;"><strong>Email:</strong> <span style="color:#333;">${displayEmail}</span></p>`;
     if (order.date) {
       html += `<p style="margin:0;font-size:14px;color:#666;">Order Date: ${order.date}</p>`;
     }

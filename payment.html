@@ -24,6 +24,7 @@
   <h2>Payment</h2>
   <p>This is a mock payment page (static) added for AEP testing. Press "Pay now" to simulate a payment flow.</p>
   <form id="paymentForm">
+    <label>Email: <input type="email" name="email" id="customerEmail" placeholder="Enter your email (optional)"></label><br><br>
     <label>Card number (mock): <input type="text" name="card" value="4111 1111 1111 1111"></label><br><br>
     <label>Name on card: <input type="text" name="name" value="Test Customer"></label><br><br>
     <button type="submit" id="payNow" style="padding:10px 20px;background:#ff4081;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;">Pay now</button>
@@ -112,6 +113,24 @@
       // Generate unique order ID
       const orderId = 'VEL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
       
+      // Get user-entered email or generate random email
+      const userEmail = document.getElementById('customerEmail').value.trim();
+      let customerEmail;
+      
+      if (userEmail) {
+        customerEmail = userEmail;
+      } else {
+        // Generate random email if user didn't enter one
+        const firstNames = ['john', 'emma', 'michael', 'sophia', 'david', 'olivia', 'james', 'ava', 'william', 'isabella', 'robert', 'mia', 'joseph', 'charlotte', 'daniel', 'amelia', 'henry', 'harper', 'alexander', 'evelyn'];
+        const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'wilson', 'anderson', 'taylor', 'thomas', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson'];
+        const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'mail.com'];
+        const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const randomNum = Math.floor(Math.random() * 999) + 1;
+        const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+        customerEmail = randomFirst + '.' + randomLast + randomNum + '@' + randomDomain;
+      }
+      
       // Calculate total revenue
       const totalRevenue = cart.reduce((sum, item) => {
         return sum + ((item.price || 0) * (item.quantity || 1));
@@ -130,6 +149,7 @@
       // Create order object
       const order = {
         id: orderId,
+        email: customerEmail,
         products: orderProducts,
         revenue: totalRevenue,
         timestamp: new Date().toISOString(),
