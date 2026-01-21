@@ -155,6 +155,61 @@
     
     container.appendChild(div);
   });
+
+  // Push productDetails on homepage to a consistent path for Launch
+  try {
+    var featured = products.slice(0,4).map(function(p){
+      return {
+        productID: 'VEL-' + p.id,
+        sku: p.sku || String(p.id),
+        productName: p.name,
+        brand: 'velora',
+        category: p.category || '',
+        price: p.price || 0,
+        quantity: 1,
+        currencyCode: p.currency || 'USD'
+      };
+    });
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'pageLoaded',
+      xdmPageLoad: {
+        web: {
+          webPageDetails: {
+            brand: 'velora',
+            channel: 'web|home',
+            pageName: 'home',
+            pageType: 'home',
+            pageUrl: window.location.href
+          },
+          productDetails: featured
+        }
+      },
+      custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+    });
+  } catch (e) { console.error('Home productDetails push error', e); }
+      // add productDetails for home/featured products
+      try {
+        var featured = window.products && window.products.slice(0,4) || [];
+        var homeMapped = featured.map(function(p){
+          return {
+            productID: 'VEL-' + (p.id || ''),
+            sku: p.sku || String(p.id || ''),
+            productName: p.name || '',
+            brand: p.brand || 'velora',
+            category: p.category || '',
+            price: p.price || 0,
+            quantity: 1,
+            currencyCode: p.currency || 'USD',
+            image: p.image || ''
+          };
+        });
+        window.adobeDataLayer.push({
+          event: 'pageLoaded',
+          xdmPageLoad: { web: { productDetails: homeMapped } },
+          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+        });
+      } catch (e) { console.error('home productDetails push error', e); }
 </script>
 </body>
 </html>

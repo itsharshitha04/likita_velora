@@ -173,6 +173,53 @@
     } catch (e) {
       console.error('Error pushing productView to adobeDataLayer', e);
     }
+      // also push canonical productDetails for PDP
+      try {
+        var pd = (product) ? [{
+          productID: 'VEL-' + (product.id || ''),
+          sku: product.sku || String(product.id || ''),
+          productName: product.name || '',
+          brand: product.brand || 'velora',
+          category: product.category || '',
+          price: product.price || 0,
+          quantity: 1,
+          currencyCode: product.currency || 'USD',
+          image: product.image || ''
+        }] : [];
+        window.adobeDataLayer.push({
+          event: 'pageLoaded',
+          xdmPageLoad: { web: { productDetails: pd } },
+          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+        });
+      } catch (e) { console.error('pdp productDetails push error', e); }
+    // Also push productDetails under standardized xdmPageLoad.web.productDetails
+    try {
+      window.adobeDataLayer.push({
+        event: 'pageLoaded',
+        xdmPageLoad: {
+          web: {
+            webPageDetails: {
+              brand: 'velora',
+              channel: 'web|pdp',
+              pageName: 'product:VEL-' + product.id,
+              pageType: 'pdp',
+              pageUrl: window.location.href
+            },
+            productDetails: [{
+              productID: 'VEL-' + product.id,
+              sku: product.sku || 'SKU-' + product.id,
+              productName: product.name,
+              brand: 'velora',
+              category: product.category || '',
+              price: product.price || 0,
+              quantity: 1,
+              currencyCode: product.currency || 'USD'
+            }]
+          }
+        },
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+      });
+    } catch (e) { console.error('PDP productDetails push error', e); }
   }
 </script>
 </body>
