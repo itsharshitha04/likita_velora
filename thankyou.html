@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', function(){
     window.adobeDataLayer.push({
       event: 'pageLoaded',
       xdmPageLoad: {
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
         web: {
           webPageDetails: {
             brand: 'velora',
@@ -67,8 +68,7 @@ document.addEventListener('DOMContentLoaded', function(){
             pageUrl: window.location.href
           }
         }
-      },
-      custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+      }
     });
   } catch (e) { console.error('Thankyou pageLoaded push error', e); }
 
@@ -207,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function(){
           window.adobeDataLayer.push({
             event: 'pageLoaded',
             xdmPageLoad: {
+              custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
               web: {
                 webPageDetails: {
                   brand: 'velora',
@@ -228,8 +229,7 @@ document.addEventListener('DOMContentLoaded', function(){
                   };
                 })
               }
-            },
-            custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+            }
           });
         } catch (e2) { console.error('Thankyou productDetails push error', e2); }
       }
