@@ -131,73 +131,25 @@
     // Insert image before the first element
     container.insertBefore(img, container.firstChild);
     
-    // Fire pageLoaded with productDetails (PDP is the ONLY page where productDetails is in pageLoaded)
-    if (window.adl && window.adl.firePageLoaded) {
-      window.adl.firePageLoaded({
-        pageName: 'product:VEL-' + product.id,
-        pageType: 'pdp',
-        productDetails: {
-          productID: 'VEL-' + product.id,
-          sku: product.sku || 'SKU-' + product.id,
-          productName: product.name,
-          brand: 'velora',
-          category: product.category,
-          price: product.price,
-          color: '',
-          size: '',
-          quantity: 1,
-          currency: 'USD'
-        }
-      });
-    }
-    // Push productView event into adobeDataLayer so Adobe Launch/AEP can capture PDP views
+    // Single pageLoaded event for PDP with product details and persistence
     try {
+      const productDetails = [{
+        productID: 'VEL-' + product.id,
+        sku: product.sku || 'SKU-' + product.id,
+        productName: product.name,
+        brand: 'velora',
+        category: product.category || '',
+        price: product.price || 0,
+        quantity: 1,
+        currencyCode: product.currency || 'USD'
+      }];
+      
+      // Push single pageLoaded event
       window.adobeDataLayer = window.adobeDataLayer || [];
-      window.adobeDataLayer.push({
-        event: 'productView',
-        xdmCommerce: {
-          productViews: {
-            products: [
-              {
-                productID: 'VEL-' + product.id,
-                productName: product.name,
-                sku: product.sku || 'SKU-' + product.id,
-                price: product.price || 0,
-                currencyCode: product.currency || 'USD',
-                category: product.category || '',
-                brand: 'velora'
-              }
-            ]
-          }
-        }
-      });
-    } catch (e) {
-      console.error('Error pushing productView to adobeDataLayer', e);
-    }
-      // also push canonical productDetails for PDP
-      try {
-        var pd = (product) ? [{
-          productID: 'VEL-' + (product.id || ''),
-          sku: product.sku || String(product.id || ''),
-          productName: product.name || '',
-          brand: product.brand || 'velora',
-          category: product.category || '',
-          price: product.price || 0,
-          quantity: 1,
-          currencyCode: product.currency || 'USD',
-          image: product.image || ''
-        }] : [];
-        window.adobeDataLayer.push({
-          event: 'pageLoaded',
-          xdmPageLoad: { web: { productDetails: pd } },
-          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
-        });
-      } catch (e) { console.error('pdp productDetails push error', e); }
-    // Also push productDetails under standardized xdmPageLoad.web.productDetails
-    try {
       window.adobeDataLayer.push({
         event: 'pageLoaded',
         xdmPageLoad: {
+          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
           web: {
             webPageDetails: {
               brand: 'velora',
@@ -206,21 +158,17 @@
               pageType: 'pdp',
               pageUrl: window.location.href
             },
-            productDetails: [{
-              productID: 'VEL-' + product.id,
-              sku: product.sku || 'SKU-' + product.id,
-              productName: product.name,
-              brand: 'velora',
-              category: product.category || '',
-              price: product.price || 0,
-              quantity: 1,
-              currencyCode: product.currency || 'USD'
-            }]
+            productDetails: productDetails
           }
-        },
-        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+        }
       });
-    } catch (e) { console.error('PDP productDetails push error', e); }
+      
+      // Persist product details to sessionStorage for subsequent pages
+      sessionStorage.setItem('velora_productListItems', JSON.stringify(productDetails));
+      
+    } catch (e) { 
+      console.error('PDP pageLoaded push error', e); 
+    }
   }
 </script>
 </body>

@@ -11,17 +11,7 @@
 <script src="adl-utils.js"></script>
 <script src="adl-xdm-normalizer.js"></script>
 <script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
-<script>
-  // Fire pageLoaded event for PLP
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.adl && window.adl.firePageLoaded) {
-      window.adl.firePageLoaded({
-        pageName: 'plp',
-        pageType: 'category'
-      });
-    }
-  });
-</script>
+
 </head>
 <body>
 <nav>
@@ -147,60 +137,41 @@
     grid.appendChild(div);
   });
 
-    // Push productDetails for PLP to a consistent path for Launch
-    try {
-      var allProducts = (products || []).map(function(p){
-        return {
-          productID: 'VEL-' + p.id,
-          sku: p.sku || String(p.id),
-          productName: p.name,
-          brand: 'velora',
-          category: p.category || '',
-          price: p.price || 0,
-          quantity: 1,
-          currencyCode: p.currency || 'USD'
-        };
-      });
-      window.adobeDataLayer = window.adobeDataLayer || [];
-      window.adobeDataLayer.push({
-        event: 'pageLoaded',
-        xdmPageLoad: {
-          web: {
-            webPageDetails: {
-              brand: 'velora',
-              channel: 'web|plp',
-              pageName: 'plp',
-              pageType: 'category',
-              pageUrl: window.location.href
-            },
-            productDetails: allProducts
+    // Single pageLoaded event for PLP with all products
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        var allProducts = (products || []).map(function(p){
+          return {
+            productID: 'VEL-' + p.id,
+            sku: p.sku || String(p.id),
+            productName: p.name,
+            brand: 'velora',
+            category: p.category || '',
+            price: p.price || 0,
+            quantity: 1,
+            currencyCode: p.currency || 'USD'
+          };
+        });
+        
+        window.adobeDataLayer = window.adobeDataLayer || [];
+        window.adobeDataLayer.push({
+          event: 'pageLoaded',
+          xdmPageLoad: {
+            custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+            web: {
+              webPageDetails: {
+                brand: 'velora',
+                channel: 'web|plp',
+                pageName: 'plp',
+                pageType: 'category',
+                pageUrl: window.location.href
+              },
+              productDetails: allProducts
+            }
           }
-        },
-        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
-      });
-    } catch (e) { console.error('PLP productDetails push error', e); }
-    // ensure productDetails present for PLP
-    try {
-      var all = window.products || [];
-      var prodMapped = all.map(function(p){
-        return {
-          productID: 'VEL-' + (p.id || ''),
-          sku: p.sku || String(p.id || ''),
-          productName: p.name || '',
-          brand: p.brand || 'velora',
-          category: p.category || '',
-          price: p.price || 0,
-          quantity: 1,
-          currencyCode: p.currency || 'USD',
-          image: p.image || ''
-        };
-      });
-      window.adobeDataLayer.push({
-        event: 'pageLoaded',
-        xdmPageLoad: { web: { productDetails: prodMapped } },
-        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
-      });
-    } catch (e) { console.error('plp productDetails push error', e); }
+        });
+      } catch (e) { console.error('PLP pageLoaded push error', e); }
+    });
 </script>
 </body>
 </html>

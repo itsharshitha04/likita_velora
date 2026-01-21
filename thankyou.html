@@ -52,8 +52,44 @@ document.addEventListener('DOMContentLoaded', function(){
   // Initialize cart (should be empty after checkout)
   initCart();
 
-  // Fire pageLoaded FIRST (no product data per spec)
+  // Fire pageLoaded with persisted product details from PDP/order
   try {
+    // Try to get persisted product details or order products
+    let productDetails = [];
+    
+    // Check for persisted products from PDP first
+    try {
+      const persistedProducts = sessionStorage.getItem('velora_productListItems');
+      if (persistedProducts) {
+        productDetails = JSON.parse(persistedProducts);
+      }
+    } catch (e) {}
+    
+    // If no persisted products, try to get from order if available
+    let order = null;
+    if (!productDetails.length) {
+      try {
+        const lastOrderData = localStorage.getItem('lastOrder') || sessionStorage.getItem('lastOrder');
+        if (lastOrderData) {
+          order = JSON.parse(lastOrderData);
+          if (order && order.products) {
+            productDetails = order.products.map(function(p) {
+              return {
+                productID: p.productId || p.productID || '',
+                sku: p.sku || '',
+                productName: p.productName || p.name || '',
+                brand: p.brand || 'velora',
+                category: p.productCategory || p.category || '',
+                price: p.price || 0,
+                quantity: p.quantity || 1,
+                currencyCode: order.currency || 'USD'
+              };
+            });
+          }
+        }
+      } catch (e) {}
+    }
+    
     window.adobeDataLayer = window.adobeDataLayer || [];
     window.adobeDataLayer.push({
       event: 'pageLoaded',
@@ -66,13 +102,14 @@ document.addEventListener('DOMContentLoaded', function(){
             pageName: 'thankyou',
             pageType: 'confirmation',
             pageUrl: window.location.href
-          }
+          },
+          productDetails: productDetails
         }
       }
     });
   } catch (e) { console.error('Thankyou pageLoaded push error', e); }
 
-  // Read order data from localStorage (fallback to sessionStorage)
+  // Read order data for display
   let order = null;
   try {
     const lastOrderData = localStorage.getItem('lastOrder') || sessionStorage.getItem('lastOrder');

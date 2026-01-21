@@ -50,82 +50,59 @@
   // Initialize cart and load cart items
   initCart();
   
-  // Fire pageLoaded and scView events on page load
+  // Single pageLoaded event on page load
   document.addEventListener('DOMContentLoaded', function() {
-    // 1. Fire pageLoaded first (NO product data per spec)
-    if (window.adl && window.adl.firePageLoaded) {
-      window.adl.firePageLoaded({
-        pageName: 'cart',
-        pageType: 'cart'
-      });
-    }
-    
-    const cart = getCart();
-    
-    if (cart && cart.length > 0) {
-      // Prepare products array with full details for scView
-      const cartProducts = cart.map(function(item) {
-        return {
-          sku: item.sku || 'SKU-' + item.id,
-          productID: 'VEL-' + item.id,
-          productName: item.name || '',
-          brand: 'velora',
-          category: item.category || '',
-          price: item.price || 0,
-          quantity: item.quantity || 1,
-          color: item.color || '',
-          size: item.size || ''
-        };
-      });
+    try {
+      // Try to get persisted product details from PDP first, then fallback to cart
+      let productDetails = [];
       
-      const totalQuantity = cart.reduce(function(sum, item) {
-        return sum + (item.quantity || 1);
-      }, 0);
-      
-      const totalValue = cart.reduce(function(sum, item) {
-        return sum + (item.price || 0) * (item.quantity || 1);
-      }, 0);
-      
-      // 2. Fire scView event with all cart contents
-      if (window.adl && window.adl.trackShoppingCartView) {
-        window.adl.trackShoppingCartView({
-          totalQuantity: totalQuantity,
-          totalValue: totalValue,
-          products: cartProducts
-        }, 'cart');
-      }
-
-      // Also push uniform productDetails under xdmPageLoad.web.productDetails for Launch
+      // Check if we have persisted product details from PDP visit
       try {
-        window.adobeDataLayer = window.adobeDataLayer || [];
-        window.adobeDataLayer.push({
-          event: 'pageLoaded',
-          xdmPageLoad: {
-            web: {
-              webPageDetails: {
-                brand: 'velora',
-                channel: 'web|cart',
-                pageName: 'cart',
-                pageType: 'cart',
-                pageUrl: window.location.href
-              },
-              productDetails: cartProducts.map(function(p){
-                return {
-                  productID: p.productID || '',
-                  productName: p.productName || '',
-                  sku: p.sku || '',
-                  price: p.price || 0,
-                  quantity: p.quantity || 1,
-                  currencyCode: p.currency || 'USD',
-                  category: p.category || '',
-                  brand: p.brand || 'velora'
-                };
-              })
-            }
+        const persistedProducts = sessionStorage.getItem('velora_productListItems');
+        if (persistedProducts) {
+          productDetails = JSON.parse(persistedProducts);
+        }
+      } catch (e) {}
+      
+      // If no persisted products, use current cart items
+      if (!productDetails.length) {
+        const cart = getCart();
+        if (cart && cart.length > 0) {
+          productDetails = cart.map(function(item) {
+            return {
+              productID: 'VEL-' + item.id,
+              sku: item.sku || 'SKU-' + item.id,
+              productName: item.name || '',
+              brand: 'velora',
+              category: item.category || '',
+              price: item.price || 0,
+              quantity: item.quantity || 1,
+              currencyCode: 'USD'
+            };
+          });
+        }
+      }
+      
+      // Fire single pageLoaded event
+      window.adobeDataLayer = window.adobeDataLayer || [];
+      window.adobeDataLayer.push({
+        event: 'pageLoaded',
+        xdmPageLoad: {
+          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+          web: {
+            webPageDetails: {
+              brand: 'velora',
+              channel: 'web|cart',
+              pageName: 'cart',
+              pageType: 'cart',
+              pageUrl: window.location.href
+            },
+            productDetails: productDetails
           }
-        });
-      } catch (e) { console.error('Cart productDetails push error', e); }
-    }
+        }
+      });
+      
+    } catch (e) { console.error('Cart pageLoaded push error', e); }
     
     // Load cart items (this will render the cart)
     loadCart();

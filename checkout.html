@@ -50,43 +50,40 @@
   document.addEventListener('DOMContentLoaded', function(){
     initCart();
     
-    // Fire pageLoaded FIRST (no product data per spec) using standardized xdmPageLoad path
+    // Single pageLoaded event using persisted product details from PDP
     try {
+      // Try to get persisted product details from PDP first, then fallback to cart
+      let productDetails = [];
+      
+      try {
+        const persistedProducts = sessionStorage.getItem('velora_productListItems');
+        if (persistedProducts) {
+          productDetails = JSON.parse(persistedProducts);
+        }
+      } catch (e) {}
+      
+      // If no persisted products, use current cart items
+      if (!productDetails.length) {
+        var cartItems = getCart() || [];
+        productDetails = cartItems.map(function(p){
+          return {
+            productID: 'VEL-' + (p.id || ''),
+            sku: p.sku || String(p.id || ''),
+            productName: p.name || '',
+            brand: p.brand || 'velora',
+            category: p.category || '',
+            price: p.price || 0,
+            quantity: p.quantity || 1,
+            currencyCode: p.currency || 'USD'
+          };
+        });
+      }
+      
       window.adobeDataLayer = window.adobeDataLayer || [];
       window.adobeDataLayer.push({
         event: 'pageLoaded',
         xdmPageLoad: {
-          web: {
-            webPageDetails: {
-              brand: 'velora',
-              channel: 'web|checkout',
-              pageName: 'checkout',
-              pageType: 'checkout',
-              pageUrl: window.location.href
-            }
-          }
-        },
-        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
-      });
-    } catch (e) { console.error('Checkout pageLoaded push error', e); }
-    // Also include productDetails for checkout page
-    try {
-      var cartItems = getCart() || [];
-      var mapped = cartItems.map(function(p){
-        return {
-          productID: 'VEL-' + (p.id || ''),
-          sku: p.sku || String(p.id || ''),
-          productName: p.name || '',
-          brand: p.brand || 'velora',
-          category: p.category || '',
-          price: p.price || 0,
-          quantity: p.quantity || 1,
-          currencyCode: p.currency || 'USD'
-        };
-      });
-      window.adobeDataLayer.push({
-        event: 'pageLoaded',
-        xdmPageLoad: {
+          custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
           web: {
             webPageDetails: {
               brand: 'velora',
@@ -95,12 +92,11 @@
               pageType: 'checkout',
               pageUrl: window.location.href
             },
-            productDetails: mapped
+            productDetails: productDetails
           }
-        },
-        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+        }
       });
-    } catch (e) { console.error('Checkout productDetails push error', e); }
+    } catch (e) { console.error('Checkout pageLoaded push error', e); }
     
     // Load cart summary
     const cart = getCart();
