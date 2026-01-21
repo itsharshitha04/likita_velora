@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Cart</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="adl-xdm-normalizer.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'cart')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'cart')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'cart')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'cart')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Your Cart</h2>
+  <ul id="cartItems"></ul>
+  <div id="checkoutSection" style="display:none;">
+    <button id="checkoutButton" style="padding:10px 20px;background:#ff4081;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;margin-top:20px;">Proceed to Checkout</button>
+  </div>
+</div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'cart')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'cart')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'cart')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'cart')" style="color:#fff;text-decoration:none;">Checkout</a>
+      <a href="#" onclick="window.adl.trackLinkClick('about', 'footer', 'footer', 'cart'); return false;" style="color:#fff;text-decoration:none;">About</a>
+      <a href="#" onclick="window.adl.trackLinkClick('contact', 'footer', 'footer', 'cart'); return false;" style="color:#fff;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+  // Initialize cart and load cart items
+  initCart();
+  
+  // Fire pageLoaded and scView events on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Fire pageLoaded first (NO product data per spec)
+    if (window.adl && window.adl.firePageLoaded) {
+      window.adl.firePageLoaded({
+        pageName: 'cart',
+        pageType: 'cart'
+      });
+    }
+    
+    const cart = getCart();
+    
+    if (cart && cart.length > 0) {
+      // Prepare products array with full details for scView
+      const cartProducts = cart.map(function(item) {
+        return {
+          sku: item.sku || 'SKU-' + item.id,
+          productID: 'VEL-' + item.id,
+          productName: item.name || '',
+          brand: 'velora',
+          category: item.category || '',
+          price: item.price || 0,
+          quantity: item.quantity || 1,
+          color: item.color || '',
+          size: item.size || ''
+        };
+      });
+      
+      const totalQuantity = cart.reduce(function(sum, item) {
+        return sum + (item.quantity || 1);
+      }, 0);
+      
+      const totalValue = cart.reduce(function(sum, item) {
+        return sum + (item.price || 0) * (item.quantity || 1);
+      }, 0);
+      
+      // 2. Fire scView event with all cart contents
+      if (window.adl && window.adl.trackShoppingCartView) {
+        window.adl.trackShoppingCartView({
+          totalQuantity: totalQuantity,
+          totalValue: totalValue,
+          products: cartProducts
+        }, 'cart');
+      }
+
+      // Also push uniform productDetails under xdmPageLoad.web.productDetails for Launch
+      try {
+        window.adobeDataLayer = window.adobeDataLayer || [];
+        window.adobeDataLayer.push({
+          event: 'pageLoaded',
+          xdmPageLoad: {
+            web: {
+              webPageDetails: {
+                brand: 'velora',
+                channel: 'web|cart',
+                pageName: 'cart',
+                pageType: 'cart',
+                pageUrl: window.location.href
+              },
+              productDetails: cartProducts.map(function(p){
+                return {
+                  productID: p.productID || '',
+                  productName: p.productName || '',
+                  sku: p.sku || '',
+                  price: p.price || 0,
+                  quantity: p.quantity || 1,
+                  currencyCode: p.currency || 'USD',
+                  category: p.category || '',
+                  brand: p.brand || 'velora'
+                };
+              })
+            }
+          }
+        });
+      } catch (e) { console.error('Cart productDetails push error', e); }
+    }
+    
+    // Load cart items (this will render the cart)
+    loadCart();
+    
+    // Add checkout button handler
+    const checkoutBtn = document.getElementById('checkoutButton');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentCart = getCart();
+        
+        // Track beginCheckout event per spec
+        if (window.adl && window.adl.trackBeginCheckout && currentCart.length > 0) {
+          const totalQuantity = currentCart.reduce(function(sum, item) {
+            return sum + (item.quantity || 1);
+          }, 0);
+          const totalValue = currentCart.reduce(function(sum, item) {
+            return sum + (item.price || 0) * (item.quantity || 1);
+          }, 0);
+          
+          window.adl.trackBeginCheckout({
+            totalQuantity: totalQuantity,
+            totalValue: totalValue
+          });
+        }
+        
+        // Navigate to checkout
+        window.location.href = 'checkout.html';
+      });
+    }
+  });
+</script>
+</body>
+</html>

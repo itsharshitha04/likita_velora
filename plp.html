@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Shop</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="adl-xdm-normalizer.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
+<script>
+  // Fire pageLoaded event for PLP
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.adl && window.adl.firePageLoaded) {
+      window.adl.firePageLoaded({
+        pageName: 'plp',
+        pageType: 'category'
+      });
+    }
+  });
+</script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'plp')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'plp')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'plp')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'plp')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>All Products</h2>
+  <div class="products" id="productGrid"></div>
+</div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'plp')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'plp')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'plp')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'plp')" style="color:#fff;text-decoration:none;">Checkout</a>
+      <a href="#" onclick="window.adl.trackLinkClick('about', 'footer', 'footer', 'plp'); return false;" style="color:#fff;text-decoration:none;">About</a>
+      <a href="#" onclick="window.adl.trackLinkClick('contact', 'footer', 'footer', 'plp'); return false;" style="color:#fff;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+  // Initialize cart to show count badge
+  initCart();
+  
+  // Display all products with proper image error handling
+  const grid = document.getElementById('productGrid');
+  products.forEach((p, index)=>{
+    const div = document.createElement('div');
+    div.className="product";
+    
+    // Create image element with proper dimensions and error handling
+    const img = document.createElement('img');
+    img.alt = p.name;
+    img.loading = "lazy";
+    img.width = 220;
+    img.height = 250;
+    img.style.display = 'block';
+    img.style.width = '100%';
+    img.style.height = '250px';
+    img.style.objectFit = 'cover';
+    img.style.backgroundColor = '#f0f0f0';
+    
+    let imageLoaded = false;
+    
+    // Image loaded successfully - show it
+    img.onload = function() {
+      imageLoaded = true;
+      this.style.opacity = '1';
+    };
+    
+    // Image failed to load - use fallback
+    img.onerror = function() {
+      if (!imageLoaded) {
+        this.src = 'https://via.placeholder.com/220x250/cccccc/666666?text=' + encodeURIComponent(p.name.substring(0, 20));
+        imageLoaded = true;
+        this.style.opacity = '1';
+      }
+    };
+    
+    // Set initial state for fade-in
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.3s ease-in';
+    
+    // Start loading the image
+    img.src = p.image;
+    
+    // Check if image is already cached/loaded
+    if (img.complete && img.naturalHeight !== 0) {
+      img.style.opacity = '1';
+      imageLoaded = true;
+    }
+    
+    // Set up click handler for product image - use 'card' linkType per spec
+    img.addEventListener('click', function(e) {
+      window.adl.trackLinkClick(p.name, 'card', 'plp-grid', 'plp');
+      window.location.href = 'pdp.html?id=' + p.id;
+    });
+    
+    // Create Add to Cart button with tracking
+    // Per spec: DO NOT fire linkClicked for Add to Cart - use addToCart event only
+    const addToCartBtn = document.createElement('button');
+    addToCartBtn.textContent = 'Add to Cart';
+    addToCartBtn.onclick = function(e) {
+      e.preventDefault();
+      const product = products.find(x=>x.id===p.id);
+      
+      // Track addToCart event ONLY (no linkClicked per spec)
+      if (window.adl && window.adl.trackAddToCart) {
+        window.adl.trackAddToCart({
+          sku: product.sku || 'SKU-' + product.id,
+          productID: 'VEL-' + product.id,
+          productName: product.name,
+          brand: 'velora',
+          category: product.category,
+          color: '',
+          size: '',
+          price: product.price,
+          quantity: 1,
+          linkPosition: 'plp-grid',
+          linkType: 'cta'
+        });
+      }
+      
+      addToCart(product);
+    };
+    
+    div.innerHTML = `<h3>${p.name}</h3><p>₹${p.price}</p>`;
+    div.appendChild(addToCartBtn);
+    div.insertBefore(img, div.firstChild);
+    
+    grid.appendChild(div);
+  });
+
+    // Push productDetails for PLP to a consistent path for Launch
+    try {
+      var allProducts = (products || []).map(function(p){
+        return {
+          productID: 'VEL-' + p.id,
+          sku: p.sku || String(p.id),
+          productName: p.name,
+          brand: 'velora',
+          category: p.category || '',
+          price: p.price || 0,
+          quantity: 1,
+          currencyCode: p.currency || 'USD'
+        };
+      });
+      window.adobeDataLayer = window.adobeDataLayer || [];
+      window.adobeDataLayer.push({
+        event: 'pageLoaded',
+        xdmPageLoad: {
+          web: {
+            webPageDetails: {
+              brand: 'velora',
+              channel: 'web|plp',
+              pageName: 'plp',
+              pageType: 'category',
+              pageUrl: window.location.href
+            },
+            productDetails: allProducts
+          }
+        },
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+      });
+    } catch (e) { console.error('PLP productDetails push error', e); }
+    // ensure productDetails present for PLP
+    try {
+      var all = window.products || [];
+      var prodMapped = all.map(function(p){
+        return {
+          productID: 'VEL-' + (p.id || ''),
+          sku: p.sku || String(p.id || ''),
+          productName: p.name || '',
+          brand: p.brand || 'velora',
+          category: p.category || '',
+          price: p.price || 0,
+          quantity: 1,
+          currencyCode: p.currency || 'USD',
+          image: p.image || ''
+        };
+      });
+      window.adobeDataLayer.push({
+        event: 'pageLoaded',
+        xdmPageLoad: { web: { productDetails: prodMapped } },
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+      });
+    } catch (e) { console.error('plp productDetails push error', e); }
+</script>
+</body>
+</html>

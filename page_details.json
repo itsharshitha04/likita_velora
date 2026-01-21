@@ -1,0 +1,9 @@
+[
+  { "pageName": "Home", "pageType": "home", "pageUrl": "index.html" },
+  { "pageName": "Shop", "pageType": "plp", "pageUrl": "plp.html" },
+  { "pageName": "Product Detail", "pageType": "pdp", "pageUrl": "pdp.html?id={productId}" },
+  { "pageName": "Cart", "pageType": "cart", "pageUrl": "cart.html" },
+  { "pageName": "Checkout", "pageType": "checkout", "pageUrl": "checkout.html" },
+  { "pageName": "Payment", "pageType": "payment", "pageUrl": "payment.html" },
+  { "pageName": "Thank You", "pageType": "thankyou", "pageUrl": "thankyou.html" }
+]

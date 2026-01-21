@@ -1,0 +1,6 @@
+[
+  {"id":"1","sku":"1","name":"Classic Denim Jacket","category":"Jackets","brand":"Velora","price":2499},
+  {"id":"2","sku":"2","name":"Casual White Shirt","category":"Shirts","brand":"Velora","price":1299},
+  {"id":"3","sku":"3","name":"Summer Floral Dress","category":"Dresses","brand":"Velora","price":1999},
+  {"id":"4","sku":"4","name":"Slim Fit Chinos","category":"Trousers","brand":"Velora","price":1799}
+]
