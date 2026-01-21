@@ -162,6 +162,42 @@ document.addEventListener('DOMContentLoaded', function(){
       productDetails: purchaseProducts
     });
     
+    // Also push structured `purchase` event for Adobe Launch / AEP (dedupe by order ID)
+    try {
+      window.adobeDataLayer = window.adobeDataLayer || [];
+      window.__purchaseFiredMap = window.__purchaseFiredMap || {};
+      if (order.id && !window.__purchaseFiredMap[order.id]) {
+        window.__purchaseFiredMap[order.id] = true;
+
+        window.adobeDataLayer.push({
+          event: 'purchase',
+          xdmCommerce: {
+            purchases: {
+              order: {
+                orderID: order.id,
+                priceTotal: order.revenue || 0,
+                currencyCode: order.currency || 'USD'
+              },
+              products: (order.products || []).map(function (p) {
+                return {
+                  productID: p.productId || p.productID || '',
+                  productName: p.productName || p.name || '',
+                  sku: p.sku || '',
+                  price: p.price || 0,
+                  quantity: p.quantity || 1,
+                  currencyCode: order.currency || 'USD',
+                  category: p.productCategory || p.category || '',
+                  brand: p.brand || 'velora'
+                };
+              })
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Error pushing purchase to adobeDataLayer', e);
+    }
+
     // Clear order from storage after tracking
     try {
       localStorage.removeItem('lastOrder');

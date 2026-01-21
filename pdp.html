@@ -149,6 +149,30 @@
         }
       });
     }
+    // Push productView event into adobeDataLayer so Adobe Launch/AEP can capture PDP views
+    try {
+      window.adobeDataLayer = window.adobeDataLayer || [];
+      window.adobeDataLayer.push({
+        event: 'productView',
+        xdmCommerce: {
+          productViews: {
+            products: [
+              {
+                productID: 'VEL-' + product.id,
+                productName: product.name,
+                sku: product.sku || 'SKU-' + product.id,
+                price: product.price || 0,
+                currencyCode: product.currency || 'USD',
+                category: product.category || '',
+                brand: 'velora'
+              }
+            ]
+          }
+        }
+      });
+    } catch (e) {
+      console.error('Error pushing productView to adobeDataLayer', e);
+    }
   }
 </script>
 </body>
