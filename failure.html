@@ -56,13 +56,18 @@ document.addEventListener('DOMContentLoaded', function(){
   // Fire pageLoaded event
   window.adobeDataLayer.push({
     event: 'pageLoaded',
-    pageInfo: {
-      pageName: 'order-cancelled',
-      pageType: 'error',
-      pageCategory: 'checkout',
-      brand: 'velora'
-    },
-    custData: window.adl.buildCustData()
+    xdmPageLoad: {
+      custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+      web: {
+        webPageDetails: {
+          brand: 'velora',
+          channel: 'web|error',
+          pageName: 'order-cancelled',
+          pageType: 'error',
+          pageUrl: window.location.href
+        }
+      }
+    }
   });
 });
 </script>

@@ -55,13 +55,18 @@
     // Fire pageLoaded FIRST (no product data per spec)
     window.adobeDataLayer.push({
       event: 'pageLoaded',
-      pageInfo: {
-        pageName: 'payment',
-        pageType: 'checkout',
-        pageCategory: 'checkout',
-        brand: 'velora'
-      },
-      custData: window.adl.buildCustData()
+      xdmPageLoad: {
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+        web: {
+          webPageDetails: {
+            brand: 'velora',
+            channel: 'web|checkout',
+            pageName: 'payment',
+            pageType: 'checkout',
+            pageUrl: window.location.href
+          }
+        }
+      }
     });
     
     // Fire scCheckout for payment step

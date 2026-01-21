@@ -148,12 +148,16 @@ function pushPageView(options = {}) {
   const payload = {
     event: 'pageLoaded',
     xdmPageLoad: {
-      pageInfo: {
-        pageName: (pageName ? pageName + ' | velora' : (window.location.pathname || 'unknown') + ' | velora'),
-        pageURL: window.location.href,
-        server: 'velora-server'
-      },
-      custData: custData
+      custData: custData,
+      web: {
+        webPageDetails: {
+          brand: 'velora',
+          channel: 'web|' + pageType,
+          pageName: (pageName ? pageName + ' | velora' : (window.location.pathname || 'unknown') + ' | velora'),
+          pageType: pageType,
+          pageUrl: window.location.href
+        }
+      }
     },
     xdm: buildXDMStructure({
       pageType: pageType,
