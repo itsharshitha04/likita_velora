@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,8 +53,22 @@ document.addEventListener('DOMContentLoaded', function(){
   // Initialize cart (should be empty after checkout)
   initCart();
 
-  // Fire pageLoaded with persisted product details from PDP/order
+  // Fire pageLoaded with consistent structure (clear any previous inconsistent events)
   try {
+    // Clear any previous pageLoaded events to ensure consistency
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    
+    // Remove any existing pageLoaded events (keep only non-pageLoaded events)
+    const nonPageLoadedEvents = window.adobeDataLayer.filter(function(item) {
+      return !(item && item.event === 'pageLoaded');
+    });
+    
+    // Reset the data layer with non-pageLoaded events
+    window.adobeDataLayer.length = 0;
+    nonPageLoadedEvents.forEach(function(item) {
+      window.adobeDataLayer.push(item);
+    });
+    
     // Try to get persisted product details or order products
     let productDetails = [];
     
@@ -90,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function(){
       } catch (e) {}
     }
     
-    window.adobeDataLayer = window.adobeDataLayer || [];
+    // Push the consistent pageLoaded event structure
     window.adobeDataLayer.push({
       event: 'pageLoaded',
       xdmPageLoad: {
@@ -305,3 +320,297 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Thank You</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="adl-xdm-normalizer.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'thankyou')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'thankyou')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'thankyou')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'thankyou')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Thank You for Your Order!</h2>
+  <p>Your order has been placed successfully.</p>
+  <div id="orderDetails">
+    <p>Loading order details...</p>
+  </div>
+  <button onclick="window.adl.trackLinkClick('back-to-home', 'cta', 'thankyou-content', 'thankyou'); window.location.href='index.html';" style="padding:10px 20px;background:#ff4081;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;margin-top:20px;">Back to Home</button>
+</div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'thankyou')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'thankyou')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'thankyou')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'thankyou')" style="color:#fff;text-decoration:none;">Checkout</a>
+      <a href="#" onclick="window.adl.trackLinkClick('about', 'footer', 'footer', 'thankyou'); return false;" style="color:#fff;text-decoration:none;">About</a>
+      <a href="#" onclick="window.adl.trackLinkClick('contact', 'footer', 'footer', 'thankyou'); return false;" style="color:#fff;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  // Initialize cart (should be empty after checkout)
+  initCart();
+
+  // Fire pageLoaded with consistent structure (clear any previous inconsistent events)
+  try {
+    // Clear any previous pageLoaded events to ensure consistency
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    
+    // Remove any existing pageLoaded events (keep only non-pageLoaded events)
+    const nonPageLoadedEvents = window.adobeDataLayer.filter(function(item) {
+      return !(item && item.event === 'pageLoaded');
+    });
+    
+    // Reset the data layer with non-pageLoaded events
+    window.adobeDataLayer.length = 0;
+    nonPageLoadedEvents.forEach(function(item) {
+      window.adobeDataLayer.push(item);
+    });
+    
+    // Try to get persisted product details or order products
+    let productDetails = [];
+    
+    // Check for persisted products from PDP first
+    try {
+      const persistedProducts = sessionStorage.getItem('velora_productListItems');
+      if (persistedProducts) {
+        productDetails = JSON.parse(persistedProducts);
+      }
+    } catch (e) {}
+    
+    // If no persisted products, try to get from order if available
+    let order = null;
+    if (!productDetails.length) {
+      try {
+        const lastOrderData = localStorage.getItem('lastOrder') || sessionStorage.getItem('lastOrder');
+        if (lastOrderData) {
+          order = JSON.parse(lastOrderData);
+          if (order && order.products) {
+            productDetails = order.products.map(function(p) {
+              return {
+                productID: p.productId || p.productID || '',
+                sku: p.sku || '',
+                productName: p.productName || p.name || '',
+                brand: p.brand || 'velora',
+                category: p.productCategory || p.category || '',
+                price: p.price || 0,
+                quantity: p.quantity || 1,
+                currencyCode: order.currency || 'USD'
+              };
+            });
+          }
+        }
+      } catch (e) {}
+    }
+    
+    // Push the consistent pageLoaded event structure
+    window.adobeDataLayer.push({
+      event: 'pageLoaded',
+      xdmPageLoad: {
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+        web: {
+          webPageDetails: {
+            brand: 'velora',
+            channel: 'web|confirmation',
+            pageName: 'thankyou',
+            pageType: 'confirmation',
+            pageUrl: window.location.href
+          },
+          productDetails: productDetails
+        }
+      }
+    });
+  } catch (e) { console.error('Thankyou pageLoaded push error', e); }
+
+  // Read order data for display
+  let order = null;
+  try {
+    const lastOrderData = localStorage.getItem('lastOrder') || sessionStorage.getItem('lastOrder');
+    if (lastOrderData) {
+      order = JSON.parse(lastOrderData);
+    }
+  } catch (e) {
+    console.error('Error reading order from storage:', e);
+  }
+
+  const orderDetailsEl = document.getElementById('orderDetails');
+
+  // Function to generate random email
+  function generateRandomEmail() {
+    const firstNames = ['john', 'emma', 'michael', 'sophia', 'david', 'olivia', 'james', 'ava', 'william', 'isabella', 'robert', 'mia', 'joseph', 'charlotte', 'daniel', 'amelia', 'henry', 'harper', 'alexander', 'evelyn'];
+    const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'wilson', 'anderson', 'taylor', 'thomas', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson'];
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'mail.com'];
+    const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const randomNum = Math.floor(Math.random() * 999) + 1;
+    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+    return randomFirst + '.' + randomLast + randomNum + '@' + randomDomain;
+  }
+
+  if (order && order.id) {
+    // Use existing email or generate a random one
+    const displayEmail = order.email || generateRandomEmail();
+    
+    // Display order ID and email
+    let html = `<div style="background:#f0f0f0;padding:20px;border-radius:8px;margin-bottom:20px;">`;
+    html += `<p style="font-size:18px;margin:0 0 10px 0;"><strong>Order ID:</strong> <span style="color:#ff4081;font-weight:bold;">${order.id}</span></p>`;
+    html += `<p style="font-size:16px;margin:0 0 10px 0;"><strong>Email:</strong> <span style="color:#333;">${displayEmail}</span></p>`;
+    if (order.date) {
+      html += `<p style="margin:0;font-size:14px;color:#666;">Order Date: ${order.date}</p>`;
+    }
+    html += `</div>`;
+    
+    // Display order products list
+    if (order.products && order.products.length > 0) {
+      html += '<h3 style="margin-top:30px;margin-bottom:15px;">Order Items:</h3>';
+      html += '<ul style="list-style:none;padding:0;margin:20px 0;">';
+      
+      order.products.forEach((product, index) => {
+        const itemTotal = (product.price || 0) * (product.quantity || 1);
+        html += `
+          <li style="background:white;padding:20px;margin:15px 0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #ff4081;">
+            <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;">
+              <div style="flex:1;min-width:250px;">
+                <strong style="font-size:16px;color:#222;">${index + 1}. ${product.productName || 'Product'}</strong><br>
+                <span style="color:#666;font-size:14px;">Category: ${product.productCategory || 'N/A'}</span><br>
+                <span style="color:#666;font-size:14px;">Brand: ${product.brand || 'velora'}</span>
+              </div>
+              <div style="text-align:right;margin-top:10px;">
+                <span style="font-size:14px;color:#666;">₹${product.price || 0} × ${product.quantity || 1}</span><br>
+                <span style="font-size:18px;font-weight:bold;color:#ff4081;">₹${itemTotal}</span>
+              </div>
+            </div>
+          </li>
+        `;
+      });
+      
+      html += '</ul>';
+    }
+    
+    // Display total revenue
+    html += `<div style="background:#f9f9f9;padding:20px;border-radius:8px;margin-top:30px;border:2px solid #ff4081;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0;text-align:right;">Total: ₹${order.revenue || 0}</p>`;
+    html += `</div>`;
+    
+    orderDetailsEl.innerHTML = html;
+    
+    // Fire scPurchase event with order data
+    const purchaseProducts = order.products.map(function(p) {
+      return {
+        productInfo: {
+          productID: p.productId || '',
+          productName: p.productName || '',
+          brand: 'velora',
+          category: p.productCategory || '',
+          price: p.price || 0,
+          currency: 'USD'
+        },
+        quantity: p.quantity || 1
+      };
+    });
+    
+    window.adobeDataLayer.push({
+      event: 'scPurchase',
+      orderInfo: {
+        orderID: order.id,
+        orderTotal: order.revenue || 0,
+        currency: 'USD',
+        paymentMethod: 'card',
+        email: displayEmail
+      },
+      productDetails: purchaseProducts
+    });
+    
+    // Also push structured `purchase` event for Adobe Launch / AEP (dedupe by order ID)
+    try {
+      window.adobeDataLayer = window.adobeDataLayer || [];
+      window.__purchaseFiredMap = window.__purchaseFiredMap || {};
+      if (order.id && !window.__purchaseFiredMap[order.id]) {
+        window.__purchaseFiredMap[order.id] = true;
+
+        window.adobeDataLayer.push({
+          event: 'purchase',
+          xdmCommerce: {
+            purchases: {
+              order: {
+                orderID: order.id,
+                priceTotal: order.revenue || 0,
+                currencyCode: order.currency || 'USD'
+              },
+              products: (order.products || []).map(function (p) {
+                return {
+                  productID: p.productId || p.productID || '',
+                  productName: p.productName || p.name || '',
+                  sku: p.sku || '',
+                  price: p.price || 0,
+                  quantity: p.quantity || 1,
+                  currencyCode: order.currency || 'USD',
+                  category: p.productCategory || p.category || '',
+                  brand: p.brand || 'velora'
+                };
+              })
+            }
+          }
+        });
+        // Purchase event already includes product details, no need to duplicate pageLoaded
+      }
+    } catch (e) {
+      console.error('Error pushing purchase to adobeDataLayer', e);
+    }
+
+    // Clear order from storage after tracking
+    try {
+      localStorage.removeItem('lastOrder');
+      sessionStorage.removeItem('lastOrder');
+    } catch (e) {}
+  } else {
+    // No order found
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderIdFromUrl = urlParams.get('orderId');
+    
+    if (orderIdFromUrl) {
+      orderDetailsEl.innerHTML = `
+        <div style="background:#fff3cd;padding:20px;border-radius:8px;border-left:4px solid #ffc107;">
+          <p style="margin:0 0 10px 0;"><strong>Order ID:</strong> ${orderIdFromUrl}</p>
+          <p style="margin:0;color:#856404;">Order details are being processed. Please check back later or contact support.</p>
+        </div>
+      `;
+    } else {
+      orderDetailsEl.innerHTML = `
+        <div style="background:#f8d7da;padding:20px;border-radius:8px;border-left:4px solid #dc3545;">
+          <p style="margin:0 0 10px 0;color:#721c24;"><strong>Order details not found.</strong></p>
+          <p style="margin:0;color:#721c24;">If you just placed an order, please wait a moment and refresh the page.</p>
+          <p style="margin:10px 0 0 0;color:#721c24;">If the issue persists, please contact support with your order confirmation email.</p>
+        </div>
+      `;
+    }
+  }
+});
+</script>
+</body>
+</html>
+>>>>>>> Stashed changes
