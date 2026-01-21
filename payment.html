@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Payment</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="adl-xdm-normalizer.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'payment')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'payment')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'payment')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'payment')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+<div class="container">
+  <h2>Payment</h2>
+  <p>This is a mock payment page (static) added for AEP testing. Press "Pay now" to simulate a payment flow.</p>
+  <form id="paymentForm">
+    <label>Email: <input type="email" name="email" id="customerEmail" placeholder="Enter your email (optional)"></label><br><br>
+    <label>Card number (mock): <input type="text" name="card" value="4111 1111 1111 1111"></label><br><br>
+    <label>Name on card: <input type="text" name="name" value="Test Customer"></label><br><br>
+    <button type="submit" id="payNow" style="padding:10px 20px;background:#ff4081;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;">Pay now</button>
+  </form>
+</div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'payment')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'payment')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'payment')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'payment')" style="color:#fff;text-decoration:none;">Checkout</a>
+      <a href="#" onclick="window.adl.trackLinkClick('about', 'footer', 'footer', 'payment'); return false;" style="color:#fff;text-decoration:none;">About</a>
+      <a href="#" onclick="window.adl.trackLinkClick('contact', 'footer', 'footer', 'payment'); return false;" style="color:#fff;text-decoration:none;">Contact</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    initCart();
+    
+    // Fire pageLoaded FIRST (no product data per spec)
+    window.adobeDataLayer.push({
+      event: 'pageLoaded',
+      xdmPageLoad: {
+        custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+        web: {
+          webPageDetails: {
+            brand: 'velora',
+            channel: 'web|checkout',
+            pageName: 'payment',
+            pageType: 'checkout',
+            pageUrl: window.location.href
+          }
+        }
+      }
+    });
+    
+    // Fire scCheckout for payment step
+    const cart = getCart();
+    if (cart && cart.length > 0) {
+      const total = cart.reduce(function(sum, item) {
+        return sum + ((item.price || 0) * (item.quantity || 1));
+      }, 0);
+      
+      const checkoutProducts = cart.map(function(item) {
+        return {
+          productInfo: {
+            productID: 'VEL-' + (item.id || ''),
+            productName: item.name || '',
+            brand: 'velora',
+            category: item.category || '',
+            price: item.price || 0,
+            currency: 'USD'
+          },
+          quantity: item.quantity || 1
+        };
+      });
+      
+      window.adobeDataLayer.push({
+        event: 'scCheckout',
+        checkoutInfo: {
+          checkoutStep: 'payment',
+          checkoutStepNumber: 2
+        },
+        productDetails: checkoutProducts,
+        cartInfo: {
+          cartTotal: total,
+          cartItemCount: cart.reduce(function(sum, item) { return sum + (item.quantity || 1); }, 0),
+          currency: 'USD'
+        }
+      });
+    }
+    
+    // Payment form submit handler
+    document.getElementById('paymentForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      
+      const cart = getCart();
+      
+      if (!cart || cart.length === 0) {
+        alert('Your cart is empty. Please add items to cart first.');
+        return;
+      }
+      
+      // Generate unique order ID
+      const orderId = 'VEL-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      
+      // Get user-entered email or generate random email
+      const userEmail = document.getElementById('customerEmail').value.trim();
+      let customerEmail;
+      
+      if (userEmail) {
+        customerEmail = userEmail;
+      } else {
+        // Generate random email if user didn't enter one
+        const firstNames = ['john', 'emma', 'michael', 'sophia', 'david', 'olivia', 'james', 'ava', 'william', 'isabella', 'robert', 'mia', 'joseph', 'charlotte', 'daniel', 'amelia', 'henry', 'harper', 'alexander', 'evelyn'];
+        const lastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'wilson', 'anderson', 'taylor', 'thomas', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson'];
+        const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'mail.com'];
+        const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const randomNum = Math.floor(Math.random() * 999) + 1;
+        const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+        customerEmail = randomFirst + '.' + randomLast + randomNum + '@' + randomDomain;
+      }
+      
+      // Calculate total revenue
+      const totalRevenue = cart.reduce((sum, item) => {
+        return sum + ((item.price || 0) * (item.quantity || 1));
+      }, 0);
+      
+      // Transform cart items to order products format
+      const orderProducts = cart.map(item => ({
+        productId: 'VEL-' + (item.id || ''),
+        productName: item.name || 'Product',
+        productCategory: item.category || 'Uncategorized',
+        brand: 'velora',
+        price: item.price || 0,
+        quantity: item.quantity || 1
+      }));
+      
+      // Create order object
+      const order = {
+        id: orderId,
+        email: customerEmail,
+        products: orderProducts,
+        revenue: totalRevenue,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('en-IN', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      };
+      
+      // Store order in localStorage for thankyou page
+      try {
+        localStorage.setItem('lastOrder', JSON.stringify(order));
+      } catch (storageError) {
+        sessionStorage.setItem('lastOrder', JSON.stringify(order));
+      }
+      
+      // Clear cart after order is placed
+      setCart([]);
+      initCart();
+      
+      // Navigate to thank you page (scPurchase fires there)
+      window.location.href = 'thankyou.html';
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Velora Boutique - Order Cancelled</title>
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Initialize Global Data Layer (MUST be first)
+  window.adobeDataLayer = window.adobeDataLayer || [];
+</script>
+<script src="adl-utils.js"></script>
+<script src="adl-xdm-normalizer.js"></script>
+<script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
+</head>
+<body>
+<nav>
+  <h2><a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'failure')" style="text-decoration:none;color:inherit;">Velora Boutique</a></h2>
+  <div>
+    <a href="index.html" onclick="window.adl.trackLinkClick('home', 'nav', 'header-nav', 'failure')">Home</a>
+    <a href="plp.html" onclick="window.adl.trackLinkClick('collection', 'nav', 'header-nav', 'failure')">Shop</a>
+    <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'nav', 'header-nav', 'failure')">Cart <span id="cartCount" class="cart-badge" style="background:#ff4081;border-radius:50%;padding:2px 6px;font-size:12px;margin-left:5px;display:none;">0</span></a>
+  </div>
+</nav>
+
+<div class="container">
+  <div style="background:#fff3cd;padding:30px;border-radius:8px;border-left:5px solid #ffc107;margin-top:20px;">
+    <h2 style="color:#856404;margin-top:0;">Order Cancelled</h2>
+    <p style="color:#856404;font-size:18px;">Your order has been cancelled.</p>
+    <p>No charges have been made to your account. Your cart items are still available if you wish to complete your purchase later.</p>
+  </div>
+
+  <div style="display:flex;gap:20px;margin-top:30px;">
+    <button onclick="window.adl.trackLinkClick('return-to-cart', 'cta', 'failure-content', 'failure'); window.location.href='cart.html'" style="padding:12px 24px;background:#ff4081;color:white;border:none;cursor:pointer;border-radius:5px;font-size:16px;">Return to Cart</button>
+    <button onclick="window.adl.trackLinkClick('continue-shopping', 'cta', 'failure-content', 'failure'); window.location.href='plp.html'" style="padding:12px 24px;background:#f0f0f0;color:#333;border:1px solid #ddd;cursor:pointer;border-radius:5px;font-size:16px;">Continue Shopping</button>
+  </div>
+</div>
+
+<footer style="background:#222;color:#fff;padding:30px 20px;margin-top:50px;text-align:center;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <h3 style="margin-bottom:20px;">Velora Boutique</h3>
+    <div style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:20px;">
+      <a href="index.html" onclick="window.adl.trackLinkClick('home', 'footer', 'footer', 'failure')" style="color:#fff;text-decoration:none;">Home</a>
+      <a href="plp.html" onclick="window.adl.trackLinkClick('shop', 'footer', 'footer', 'failure')" style="color:#fff;text-decoration:none;">Shop</a>
+      <a href="cart.html" onclick="window.adl.trackLinkClick('cart', 'footer', 'footer', 'failure')" style="color:#fff;text-decoration:none;">Cart</a>
+      <a href="checkout.html" onclick="window.adl.trackLinkClick('checkout', 'footer', 'footer', 'failure')" style="color:#fff;text-decoration:none;">Checkout</a>
+    </div>
+    <p style="margin-top:20px;font-size:12px;opacity:0.7;">© 2024 Velora Boutique. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="client.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  initCart();
+  
+  // Fire pageLoaded event
+  window.adobeDataLayer.push({
+    event: 'pageLoaded',
+    xdmPageLoad: {
+      custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {},
+      web: {
+        webPageDetails: {
+          brand: 'velora',
+          channel: 'web|error',
+          pageName: 'order-cancelled',
+          pageType: 'error',
+          pageUrl: window.location.href
+        }
+      }
+    }
+  });
+});
+</script>
+</body>
+</html>
