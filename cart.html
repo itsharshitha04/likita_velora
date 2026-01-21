@@ -93,6 +93,37 @@
           products: cartProducts
         }, 'cart');
       }
+
+      // Also push uniform productDetails under xdmPageLoad.web.productDetails for Launch
+      try {
+        window.adobeDataLayer = window.adobeDataLayer || [];
+        window.adobeDataLayer.push({
+          event: 'pageLoaded',
+          xdmPageLoad: {
+            web: {
+              webPageDetails: {
+                brand: 'velora',
+                channel: 'web|cart',
+                pageName: 'cart',
+                pageType: 'cart',
+                pageUrl: window.location.href
+              },
+              productDetails: cartProducts.map(function(p){
+                return {
+                  productID: p.productID || '',
+                  productName: p.productName || '',
+                  sku: p.sku || '',
+                  price: p.price || 0,
+                  quantity: p.quantity || 1,
+                  currencyCode: p.currency || 'USD',
+                  category: p.category || '',
+                  brand: p.brand || 'velora'
+                };
+              })
+            }
+          }
+        });
+      } catch (e) { console.error('Cart productDetails push error', e); }
     }
     
     // Load cart items (this will render the cart)

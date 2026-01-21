@@ -193,6 +193,36 @@ document.addEventListener('DOMContentLoaded', function(){
             }
           }
         });
+        // Also push canonical productDetails under xdmPageLoad.web.productDetails
+        try {
+          window.adobeDataLayer.push({
+            event: 'pageLoaded',
+            xdmPageLoad: {
+              web: {
+                webPageDetails: {
+                  brand: 'velora',
+                  channel: 'web|confirmation',
+                  pageName: 'confirmation',
+                  pageType: 'confirmation',
+                  pageUrl: window.location.href
+                },
+                productDetails: (order.products || []).map(function(p){
+                  return {
+                    productID: p.productId || p.productID || '',
+                    productName: p.productName || p.name || '',
+                    sku: p.sku || '',
+                    price: p.price || 0,
+                    quantity: p.quantity || 1,
+                    currencyCode: order.currency || 'USD',
+                    category: p.productCategory || p.category || '',
+                    brand: p.brand || 'velora'
+                  };
+                })
+              }
+            },
+            custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+          });
+        } catch (e2) { console.error('Thankyou productDetails push error', e2); }
       }
     } catch (e) {
       console.error('Error pushing purchase to adobeDataLayer', e);
