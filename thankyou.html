@@ -52,16 +52,24 @@ document.addEventListener('DOMContentLoaded', function(){
   initCart();
 
   // Fire pageLoaded FIRST (no product data per spec)
-  window.adobeDataLayer.push({
-    event: 'pageLoaded',
-    pageInfo: {
-      pageName: 'thankyou',
-      pageType: 'confirmation',
-      pageCategory: 'checkout',
-      brand: 'velora'
-    },
-    custData: window.adl.buildCustData()
-  });
+  try {
+    window.adobeDataLayer = window.adobeDataLayer || [];
+    window.adobeDataLayer.push({
+      event: 'pageLoaded',
+      xdmPageLoad: {
+        web: {
+          webPageDetails: {
+            brand: 'velora',
+            channel: 'web|confirmation',
+            pageName: 'thankyou',
+            pageType: 'confirmation',
+            pageUrl: window.location.href
+          }
+        }
+      },
+      custData: window.adl && typeof window.adl.buildCustData === 'function' ? window.adl.buildCustData() : {}
+    });
+  } catch (e) { console.error('Thankyou pageLoaded push error', e); }
 
   // Read order data from localStorage (fallback to sessionStorage)
   let order = null;
