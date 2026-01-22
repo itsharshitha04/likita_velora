@@ -146,6 +146,7 @@
       // Transform cart items to order products format
       const orderProducts = cart.map(item => ({
         productId: 'VEL-' + (item.id || ''),
+        sku: item.sku || String(item.id || ''),
         productName: item.name || 'Product',
         productCategory: item.category || 'Uncategorized',
         brand: 'velora',
