@@ -10,6 +10,7 @@
 </script>
 <script src="adl-utils.js"></script>
 <script src="adl-xdm-normalizer.js"></script>
+<script src="adl-validation.js"></script>
 <script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
 
 </head>
@@ -165,11 +166,11 @@
                 pageName: 'plp',
                 pageType: 'category',
                 pageUrl: window.location.href
-              },
-              productDetails: allProducts
+              }
             }
           }
         });
+        console.log('✓ ACDL: PLP pageLoaded fired (no product details)');
       } catch (e) { console.error('PLP pageLoaded push error', e); }
     });
 </script>

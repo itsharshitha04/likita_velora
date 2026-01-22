@@ -10,6 +10,7 @@
 </script>
 <script src="adl-utils.js"></script>
 <script src="adl-xdm-normalizer.js"></script>
+<script src="adl-validation.js"></script>
 <script src="https://assets.adobedtm.com/21b53c73144b/a5d64b42d8b2/launch-d23e23448bea-development.min.js" async></script>
 </head>
 <body>
@@ -117,15 +118,14 @@
       // Fire scCheckout event with cart contents
       const checkoutProducts = cart.map(function(item) {
         return {
-          productInfo: {
-            productID: 'VEL-' + (item.id || ''),
-            productName: item.name || '',
-            brand: 'velora',
-            category: item.category || '',
-            price: item.price || 0,
-            currency: 'USD'
-          },
-          quantity: item.quantity || 1
+          productID: 'VEL-' + (item.id || ''),
+          sku: item.sku || String(item.id || ''),
+          productName: item.name || '',
+          brand: item.brand || 'velora',
+          category: item.category || '',
+          price: item.price || 0,
+          quantity: item.quantity || 1,
+          currencyCode: 'USD'
         };
       });
       
